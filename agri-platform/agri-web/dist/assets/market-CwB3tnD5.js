@@ -1,0 +1,1 @@
+import{r as t}from"./request-TUdE4Crp.js";const r=e=>t.get("/market/price",{params:{category:e}}),g=(e,s)=>t.get(`/market/trend/${e}`,{params:{days:s}}),o=()=>t.get("/market/categories"),c=e=>t.get("/news/list",{params:e}),m=e=>t.get(`/news/${e}`),n=()=>t.get("/market/home-stats");export{c as a,n as b,o as c,g as d,m as e,r as g};

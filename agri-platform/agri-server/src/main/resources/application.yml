@@ -1,0 +1,78 @@
+server:
+  port: 8888
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+spring:
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+  application:
+    name: agri-server
+  
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+    encoding: UTF-8
+  
+  datasource:
+    url: jdbc:h2:mem:agri;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MySQL;DATABASE_TO_LOWER=TRUE;CASE_INSENSITIVE_IDENTIFIERS=TRUE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+    sql-script-encoding: UTF-8
+    hikari:
+      connection-init-sql: SET NAMES 'UTF-8'
+  
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: true
+  
+  sql:
+    init:
+      mode: always
+  
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+  
+  web:
+    resources:
+      static-locations: classpath:/static/,file:./uploads/
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+jwt:
+  secret: agri-platform-secret-key-2024-for-jwt-authentication-must-be-at-least-256-bits
+  expiration: 86400000
+
+file:
+  upload:
+    path: uploads/
+
+ai:
+  zhipu:
+    api-key: 45cdbd7a78f545c4a0658681bde56a93.3s7KONYjqIUMcNsR
+    model: glm-4-flash
