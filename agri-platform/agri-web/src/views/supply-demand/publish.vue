@@ -119,7 +119,8 @@ const form = reactive({
   content: '',
   contactName: '',
   contactPhone: '',
-  contactAddress: ''
+  contactAddress: '',
+  status: 1
 })
 
 const rules = {

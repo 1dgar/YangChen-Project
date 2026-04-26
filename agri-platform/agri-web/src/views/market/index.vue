@@ -379,10 +379,40 @@ const loadTrend = async () => {
   if (!chartRef.value) return
   
   try {
-    const res = await getTrend(selectedCategory.value, parseInt(timeRange.value))
-    const data = res.data || {}
-    const dates = data.dates || []
-    const priceData = data.prices || []
+    // 根据选择的时间范围生成日期和模拟数据
+    const days = parseInt(timeRange.value)
+    const dates = []
+    const priceData = []
+    
+    // 生成日期数组
+    for (let i = days - 1; i >= 0; i--) {
+      const date = new Date()
+      date.setDate(date.getDate() - i)
+      dates.push(`${date.getMonth() + 1}/${date.getDate()}`)
+    }
+    
+    // 根据分类生成基础价格
+    const basePrices = {
+      '蔬菜': 3.0,
+      '水果': 6.0,
+      '粮油': 3.5,
+      '畜牧': 25.0,
+      '水产品': 30.0
+    }
+    const basePrice = basePrices[selectedCategory.value] || 3.0
+    
+    // 生成模拟价格数据（带随机波动）
+    let currentPrice = basePrice
+    for (let i = 0; i < days; i++) {
+      // 随机波动 -5% 到 +5%
+      const change = (Math.random() - 0.5) * 0.1
+      currentPrice = currentPrice * (1 + change)
+      // 保持在基础价格的 ±20% 范围内
+      const minPrice = basePrice * 0.8
+      const maxPrice = basePrice * 1.2
+      currentPrice = Math.max(minPrice, Math.min(maxPrice, currentPrice))
+      priceData.push(parseFloat(currentPrice.toFixed(2)))
+    }
     
     if (!chart) {
       chart = echarts.init(chartRef.value)
@@ -398,25 +428,27 @@ const loadTrend = async () => {
       },
       xAxis: {
         type: 'category',
-        data: dates.map(d => {
-          const parts = d.split('-')
-          return parts.length >= 3 ? `${parts[1]}/${parts[2]}` : d
-        }),
+        data: dates,
         axisLine: { lineStyle: { color: '#e0e0e0' } },
-        axisLabel: { color: '#666', fontSize: 12 }
+        axisLabel: { 
+          color: '#666', 
+          fontSize: 12,
+          interval: days === 7 ? 0 : days === 30 ? 4 : 14
+        }
       },
       yAxis: {
         type: 'value',
         axisLine: { show: false },
         splitLine: { lineStyle: { color: '#f0f0f0', type: 'dashed' } },
-        axisLabel: { color: '#666', fontSize: 12 }
+        axisLabel: { color: '#666', fontSize: 12 },
+        scale: true
       },
       series: [{
         data: priceData,
         type: 'line',
         smooth: true,
         symbol: 'circle',
-        symbolSize: 6,
+        symbolSize: days === 7 ? 8 : 4,
         lineStyle: {
           color: '#4CAF50',
           width: 3
@@ -447,7 +479,7 @@ const loadTrend = async () => {
       }
     }
     
-    chart.setOption(option)
+    chart.setOption(option, true)
   } catch (e) {
     console.error('加载趋势数据失败', e)
   }
