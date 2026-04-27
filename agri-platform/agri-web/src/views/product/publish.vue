@@ -34,6 +34,29 @@
             <el-form-item label="产品描述" prop="description">
               <el-input type="textarea" v-model="form.description" rows="3" placeholder="描述产品的特点、品质等信息" maxlength="500" show-word-limit />
             </el-form-item>
+            <el-form-item label="产品图片">
+              <div class="image-upload-panel">
+                <el-upload
+                  class="image-uploader"
+                  :show-file-list="false"
+                  :http-request="handleImageUpload"
+                  :before-upload="beforeImageUpload"
+                  :disabled="imageUploading"
+                  accept="image/*"
+                >
+                  <img v-if="form.image" :src="form.image" alt="产品图片预览" class="preview-image" />
+                  <div v-else class="upload-placeholder">
+                    <el-icon class="upload-icon"><Plus /></el-icon>
+                    <span>{{ imageUploading ? '上传中...' : '上传产品图片' }}</span>
+                    <small>支持 jpg/png/webp，最大 5MB</small>
+                  </div>
+                </el-upload>
+                <div class="upload-actions">
+                  <el-button v-if="form.image" size="small" @click="clearImage">移除图片</el-button>
+                  <span v-else class="upload-tip">未上传时将显示“暂无图片”</span>
+                </div>
+              </div>
+            </el-form-item>
           </div>
 
           <!-- 价格库存 -->
@@ -102,10 +125,12 @@ import { ElMessage } from 'element-plus'
 import { ArrowRight, Goods, PriceTag, Phone, Check } from '@element-plus/icons-vue'
 import { publishProduct } from '../../api/product'
 import { getCategories } from '../../api/market'
+import { uploadImage } from '../../api/file'
 
 const router = useRouter()
 const formRef = ref()
 const loading = ref(false)
+const imageUploading = ref(false)
 const categories = ref([])
 
 const form = reactive({
@@ -115,6 +140,7 @@ const form = reactive({
   unit: '斤',
   stock: 0,
   description: '',
+  image: '',
   contactName: '',
   contactPhone: '',
   contactAddress: ''
@@ -131,6 +157,38 @@ onMounted(async () => {
   const res = await getCategories()
   categories.value = res.data
 })
+
+const beforeImageUpload = (file) => {
+  const isImage = file.type.startsWith('image/')
+  const isLt5M = file.size / 1024 / 1024 < 5
+
+  if (!isImage) {
+    ElMessage.error('只能上传图片文件')
+    return false
+  }
+  if (!isLt5M) {
+    ElMessage.error('图片大小不能超过 5MB')
+    return false
+  }
+  return true
+}
+
+const handleImageUpload = async ({ file }) => {
+  imageUploading.value = true
+  try {
+    const res = await uploadImage(file)
+    form.image = res.data
+    ElMessage.success('图片上传成功')
+  } catch (error) {
+    ElMessage.error(error.message || '图片上传失败')
+  } finally {
+    imageUploading.value = false
+  }
+}
+
+const clearImage = () => {
+  form.image = ''
+}
 
 const handleSubmit = async () => {
   try {
@@ -304,6 +362,68 @@ const handleSubmit = async () => {
 .publish-form :deep(.el-select__wrapper.is-focus),
 .publish-form :deep(.el-textarea__inner:focus) {
   box-shadow: 0 0 0 1px #4CAF50 inset !important;
+}
+
+.image-upload-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.image-uploader {
+  width: 100%;
+}
+
+.publish-form :deep(.image-uploader .el-upload) {
+  width: 100%;
+  border: 1px dashed #c8d6c9;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+.publish-form :deep(.image-uploader .el-upload:hover) {
+  border-color: #4CAF50;
+}
+
+.preview-image {
+  display: block;
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+  background: #f6f8f6;
+}
+
+.upload-placeholder {
+  height: 240px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #6b7280;
+  background: linear-gradient(180deg, #fafcf9 0%, #f1f6f0 100%);
+}
+
+.upload-icon {
+  font-size: 28px;
+  color: #4CAF50;
+}
+
+.upload-placeholder small {
+  color: #9aa29c;
+}
+
+.upload-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.upload-tip {
+  font-size: 13px;
+  color: #999;
 }
 
 .form-actions {

@@ -1,0 +1,1 @@
+import{r as e}from"./request-CfWsZDny.js";const a=t=>e.get("/market/price",{params:{category:t}}),g=()=>e.get("/market/categories"),r=t=>e.get("/news/list",{params:t}),o=t=>e.get(`/news/${t}`),c=()=>e.get("/market/home-stats");export{r as a,c as b,g as c,o as d,a as g};

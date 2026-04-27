@@ -1,1 +1,0 @@
-import{r as o}from"./request-TUdE4Crp.js";const e=t=>o.get("/product/list",{params:t}),r=t=>o.get(`/product/${t}`),u=(t,s)=>o.get(`/product/my/${t}`,{params:s}),d=t=>o.post("/product",t),p=(t,s)=>o.put(`/product/${t}`,s),a=t=>o.delete(`/product/${t}`);export{r as a,u as b,a as d,e as g,d as p,p as u};

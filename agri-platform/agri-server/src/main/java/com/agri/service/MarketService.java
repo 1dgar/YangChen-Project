@@ -12,6 +12,6 @@ public interface MarketService extends IService<MarketPrice> {
     List<MarketPrice> getPrices(String category);
     Map<String, Object> getTrend(String category, Integer days);
     List<String> getCategories();
-    Page<News> getNews(Integer page, Integer size);
+    Page<News> getNews(Integer page, Integer size, String keyword, String sortBy);
     News getNewsDetail(Long id);
 }

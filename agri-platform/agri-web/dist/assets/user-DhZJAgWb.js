@@ -1,0 +1,1 @@
+import{r}from"./request-CfWsZDny.js";const o=s=>r.post("/user/login",s),a=s=>r.post("/user/register",s),u=s=>r.get(`/user/${s}`),p=(s,e)=>r.put(`/user/${s}`,e),n=s=>r.put("/user/password",s);export{n as a,u as g,o as l,a as r,p as u};

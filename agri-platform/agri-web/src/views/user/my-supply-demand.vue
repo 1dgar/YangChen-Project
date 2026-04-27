@@ -96,7 +96,7 @@
                 {{ item.status === 1 ? '进行中' : '已结束' }}
               </el-tag>
             </div>
-            <p class="description">{{ item.description || '暂无描述' }}</p>
+            <p class="description">{{ item.content || '暂无描述' }}</p>
             <div class="card-meta">
               <div class="meta-item">
                 <el-icon><Goods /></el-icon>
@@ -108,11 +108,11 @@
               </div>
               <div class="meta-item price">
                 <el-icon><Money /></el-icon>
-                <span>¥{{ item.price }}</span>
+                <span>{{ item.price || '面议' }}</span>
               </div>
               <div class="meta-item">
                 <el-icon><Location /></el-icon>
-                <span>{{ item.location || '全国' }}</span>
+                <span>{{ item.contactAddress || '暂无地址' }}</span>
               </div>
             </div>
             <div class="card-footer">
@@ -121,8 +121,8 @@
                 <span>发布于 {{ formatDate(item.createTime) }}</span>
               </div>
               <div class="view-count">
-                <el-icon><View /></el-icon>
-                <span>{{ item.viewCount || 0 }} 次浏览</span>
+                <el-icon><Phone /></el-icon>
+                <span>{{ item.contactPhone || '暂无电话' }}</span>
               </div>
             </div>
           </div>
@@ -175,7 +175,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { getMySupplyDemand, deleteSupplyDemand, updateSupplyDemand } from '../../api/supplyDemand'
 import { 
   Document, Plus, Box, ShoppingCart, CircleCheck, Remove, 
-  Search, Goods, Money, Location, Timer, View, Delete
+  Search, Goods, Money, Location, Timer, View, Delete, Phone
 } from '@element-plus/icons-vue'
 
 const router = useRouter()

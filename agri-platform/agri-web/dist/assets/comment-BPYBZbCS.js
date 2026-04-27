@@ -1,1 +1,0 @@
-import{r as m}from"./request-TUdE4Crp.js";const n=(t,e)=>m.get(`/comment/product/${t}`,{params:e}),s=t=>m.post("/comment",t),c=(t,e)=>m.put(`/comment/${t}/reply`,e),r=(t,e)=>m.get(`/comment/my/${t}`,{params:e}),a=t=>m.delete(`/comment/${t}`);export{s as a,r as b,a as d,n as g,c as r};

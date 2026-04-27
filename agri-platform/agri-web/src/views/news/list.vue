@@ -50,7 +50,7 @@
 
       <!-- 精选头条 -->
       <div class="featured-section" v-if="featuredNews.length > 0">
-        <div class="featured-main" @click="goToDetail(featuredNews[0].id)">
+          <div class="featured-main" @click="goToDetail(featuredNews[0].id)">
           <div class="featured-image">
             <img :src="featuredNews[0].coverImage" />
             <div class="featured-overlay"></div>
@@ -185,7 +185,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { getNewsList } from '../../api/market'
 import { 
@@ -197,7 +197,7 @@ const router = useRouter()
 const newsList = ref([])
 const featuredNews = ref([])
 const page = ref(1)
-const size = ref(9)
+const size = ref(12)
 const total = ref(0)
 const loading = ref(false)
 const hasMore = ref(true)
@@ -207,173 +207,72 @@ const sortBy = ref('time')
 const email = ref('')
 
 const categories = [
-  { value: 'all', label: '全部', icon: 'Collection' },
-  { value: '政策法规', label: '政策法规', icon: 'Document' },
-  { value: '市场动态', label: '市场动态', icon: 'TrendCharts' },
-  { value: '农业技术', label: '农业技术', icon: 'Tools' },
-  { value: '价格行情', label: '价格行情', icon: 'Money' },
+  { value: 'all', label: '全部资讯', icon: 'Collection' }
 ]
 
 onMounted(() => {
-  loadData()
+  loadData(true)
 })
 
-// 监听分类变化，重新加载数据
 watch(activeCategory, () => {
   page.value = 1
   newsList.value = []
   featuredNews.value = []
-  loadData()
+  loadData(true)
 })
 
-// 所有资讯数据
-const allNewsData = [
-  {
-    id: 1,
-    title: '2025年中央一号文件发布：全面推进乡村振兴',
-    summary: '文件强调要巩固拓展脱贫攻坚成果，全面推进乡村振兴，加快农业农村现代化。重点包括粮食安全、乡村产业、乡村建设等方面。',
-    coverImage: 'https://picsum.photos/seed/news1/800/400',
-    category: '政策法规',
-    author: '农业农村部',
-    viewCount: 12580,
-    createTime: '2025-04-14 08:00:00'
-  },
-  {
-    id: 2,
-    title: '全国春季农业生产工作会议召开',
-    summary: '会议强调要抓好春耕备耕工作，确保粮食播种面积稳定。',
-    coverImage: 'https://picsum.photos/seed/news2/400/300',
-    category: '政策法规',
-    author: '新华社',
-    viewCount: 8920,
-    createTime: '2025-04-13 14:30:00'
-  },
-  {
-    id: 3,
-    title: '智慧农业：无人机植保技术推广加速',
-    summary: '无人机植保作业效率是人工的30倍以上，正在全国快速推广。',
-    coverImage: 'https://picsum.photos/seed/news3/400/300',
-    category: '农业技术',
-    author: '农业科技报',
-    viewCount: 6540,
-    createTime: '2025-04-13 10:00:00'
-  },
-  {
-    id: 4,
-    title: '猪肉价格连续三个月回落，市场供应充足',
-    summary: '生猪产能持续恢复，市场供应充足，价格保持低位运行。',
-    coverImage: 'https://picsum.photos/seed/news4/400/300',
-    category: '市场动态',
-    author: '市场监测中心',
-    viewCount: 5230,
-    createTime: '2025-04-12 16:00:00'
-  },
-  {
-    id: 5,
-    title: '有机农产品认证新规实施，标准更加严格',
-    summary: '新规对有机农产品的生产、加工、销售等环节提出了更严格的要求，有助于提升有机农产品质量。',
-    coverImage: 'https://picsum.photos/seed/news5/400/300',
-    category: '政策法规',
-    author: '质量监管局',
-    viewCount: 4560,
-    createTime: '2025-04-12 09:00:00'
-  },
-  {
-    id: 6,
-    title: '大棚蔬菜种植技术：如何提高产量和品质',
-    summary: '详细介绍大棚蔬菜的温度控制、水肥管理、病虫害防治等关键技术要点。',
-    coverImage: 'https://picsum.photos/seed/news6/400/300',
-    category: '农业技术',
-    author: '农技推广站',
-    viewCount: 3890,
-    createTime: '2025-04-11 15:30:00'
-  },
-  {
-    id: 7,
-    title: '春季水果市场分析：草莓价格创新高',
-    summary: '受天气影响，今年春季草莓产量下降，价格较去年同期上涨20%。',
-    coverImage: 'https://picsum.photos/seed/news7/400/300',
-    category: '市场动态',
-    author: '市场分析师',
-    viewCount: 3240,
-    createTime: '2025-04-11 11:00:00'
-  },
-  {
-    id: 8,
-    title: '农村电商发展报告：农产品网上销售额突破万亿',
-    summary: '农村电商快速发展，成为农产品销售的重要渠道，带动农民增收。',
-    coverImage: 'https://picsum.photos/seed/news8/400/300',
-    category: '市场动态',
-    author: '商务部',
-    viewCount: 2980,
-    createTime: '2025-04-10 14:00:00'
-  },
-  {
-    id: 9,
-    title: '水稻新品种推广：亩产提高15%',
-    summary: '新型高产水稻品种在全国推广，平均亩产提高15%，助力粮食安全。',
-    coverImage: 'https://picsum.photos/seed/news9/400/300',
-    category: '农业技术',
-    author: '农科院',
-    viewCount: 2650,
-    createTime: '2025-04-10 09:30:00'
-  },
-  {
-    id: 10,
-    title: '农业补贴政策解读：种粮大户可获得额外补助',
-    summary: '今年农业补贴政策有所调整，对种粮大户和新型农业经营主体给予更多支持。',
-    coverImage: 'https://picsum.photos/seed/news10/400/300',
-    category: '政策法规',
-    author: '财政厅',
-    viewCount: 2340,
-    createTime: '2025-04-09 16:00:00'
-  },
-  {
-    id: 11,
-    title: '农业机械化率持续提升，助力农业现代化',
-    summary: '全国农作物耕种收综合机械化率超过72%，农业机械化水平不断提高。',
-    coverImage: 'https://picsum.photos/seed/news11/400/300',
-    category: '农业技术',
-    author: '农机推广站',
-    viewCount: 1890,
-    createTime: '2025-04-09 10:00:00'
-  },
-  {
-    id: 12,
-    title: '绿色食品认证企业数量突破2万家',
-    summary: '绿色食品产业快速发展，认证企业数量持续增长，产品质量不断提升。',
-    coverImage: 'https://picsum.photos/seed/news12/400/300',
-    category: '市场动态',
-    author: '绿色食品中心',
-    viewCount: 1650,
-    createTime: '2025-04-08 14:30:00'
-  }
-]
+watch(sortBy, () => {
+  page.value = 1
+  newsList.value = []
+  featuredNews.value = []
+  loadData(true)
+})
 
-const loadData = async () => {
-  // 根据分类筛选数据
-  let filteredNews = allNewsData
-  if (activeCategory.value !== 'all') {
-    filteredNews = allNewsData.filter(news => news.category === activeCategory.value)
+const mapNewsItem = (item, index) => ({
+  ...item,
+  category: '农业资讯',
+  summary: item.content?.slice(0, 80) || '暂无摘要',
+  coverImage: item.coverImage || `https://picsum.photos/seed/agri-news-${item.id || index}/800/400`
+})
+
+const loadData = async (reset = false) => {
+  loading.value = true
+  try {
+    const res = await getNewsList({
+      page: page.value,
+      size: size.value,
+      keyword: searchKeyword.value || undefined,
+      sortBy: sortBy.value
+    })
+    const records = (res.data.records || []).map(mapNewsItem)
+
+    if (reset || page.value === 1) {
+      featuredNews.value = records.slice(0, 4)
+      newsList.value = records.slice(4)
+    } else {
+      newsList.value = [...newsList.value, ...records]
+    }
+
+    total.value = res.data.total || 0
+    hasMore.value = featuredNews.value.length + newsList.value.length < total.value
+  } finally {
+    loading.value = false
   }
-  
-  // 设置头条（前4条）
-  featuredNews.value = filteredNews.slice(0, 4)
-  
-  // 设置列表（第5条开始）
-  newsList.value = filteredNews.slice(4)
-  
-  total.value = filteredNews.length
 }
 
 const handleSearch = () => {
   page.value = 1
-  loadData()
+  newsList.value = []
+  featuredNews.value = []
+  loadData(true)
 }
 
-const loadMore = () => {
-  // 静态数据模式下，加载更多功能暂时不可用
-  hasMore.value = false
+const loadMore = async () => {
+  if (!hasMore.value || loading.value) {
+    return
+  }
+  page.value += 1
+  await loadData()
 }
 
 const subscribe = () => {

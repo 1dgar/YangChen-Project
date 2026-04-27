@@ -17,8 +17,10 @@ public class NewsController {
     @GetMapping("/list")
     public Result<Page<News>> list(
             @RequestParam(defaultValue = "1") Integer page,
-            @RequestParam(defaultValue = "10") Integer size) {
-        return Result.success(marketService.getNews(page, size));
+            @RequestParam(defaultValue = "10") Integer size,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "time") String sortBy) {
+        return Result.success(marketService.getNews(page, size, keyword, sortBy));
     }
 
     @GetMapping("/{id}")

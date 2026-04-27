@@ -55,10 +55,20 @@ public class MarketServiceImpl extends ServiceImpl<MarketPriceMapper, MarketPric
     }
 
     @Override
-    public Page<News> getNews(Integer page, Integer size) {
+    public Page<News> getNews(Integer page, Integer size, String keyword, String sortBy) {
         Page<News> pageParam = new Page<>(page, size);
         LambdaQueryWrapper<News> wrapper = new LambdaQueryWrapper<>();
-        wrapper.orderByDesc(News::getCreateTime);
+
+        if (keyword != null && !keyword.isBlank()) {
+            wrapper.and(w -> w.like(News::getTitle, keyword).or().like(News::getContent, keyword));
+        }
+
+        if ("hot".equalsIgnoreCase(sortBy)) {
+            wrapper.orderByDesc(News::getViewCount).orderByDesc(News::getCreateTime);
+        } else {
+            wrapper.orderByDesc(News::getCreateTime);
+        }
+
         return newsMapper.selectPage(pageParam, wrapper);
     }
 

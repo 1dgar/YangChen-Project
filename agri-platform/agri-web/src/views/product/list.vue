@@ -197,7 +197,7 @@ import { ref, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { getProductList } from '../../api/product'
 import { getCategories } from '../../api/market'
-import { getCategoryIcon, getCategoryColor, getCategoryBgColor } from '../../utils/imageMap'
+import { getCategoryIcon, getCategoryColor } from '../../utils/imageMap'
 import { 
   ArrowRight, Search, Plus, User, Goods, Location, 
   Menu, Grid, Money, HotWater, Timer, SortUp, SortDown, 
@@ -692,7 +692,6 @@ const hideTooltip = () => {
 .product-card {
   background: #fff;
   border-radius: 8px;
-  padding: 16px;
   cursor: pointer;
   transition: all 0.2s ease;
   border: 1px solid #e8e8e8;
@@ -709,6 +708,7 @@ const hideTooltip = () => {
 
 .product-main {
   flex: 1;
+  padding: 16px 16px 0;
 }
 
 .product-tag {
@@ -764,7 +764,7 @@ const hideTooltip = () => {
 .product-meta {
   display: flex;
   gap: 16px;
-  padding-top: 12px;
+  padding: 12px 16px 16px;
   margin-top: 12px;
   border-top: 1px solid #f0f0f0;
 }

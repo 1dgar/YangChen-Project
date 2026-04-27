@@ -1,0 +1,1 @@
+import{r as e}from"./request-CfWsZDny.js";const a=p=>e.get("/supply-demand/list",{params:p}),d=p=>e.get(`/supply-demand/${p}`),n=(p,s)=>e.get(`/supply-demand/my/${p}`,{params:s}),l=p=>e.post("/supply-demand",p),u=(p,s)=>e.put(`/supply-demand/${p}`,s),m=p=>e.delete(`/supply-demand/${p}`);export{d as a,n as b,m as d,a as g,l as p,u};

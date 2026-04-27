@@ -1,7 +1,9 @@
 package com.agri.service.impl;
 
 import com.agri.entity.Favorite;
+import com.agri.entity.Product;
 import com.agri.mapper.FavoriteMapper;
+import com.agri.mapper.ProductMapper;
 import com.agri.service.FavoriteService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -14,15 +16,29 @@ import org.springframework.stereotype.Service;
 public class FavoriteServiceImpl extends ServiceImpl<FavoriteMapper, Favorite> implements FavoriteService {
 
     private final FavoriteMapper favoriteMapper;
+    private final ProductMapper productMapper;
 
     @Override
     public Page<Favorite> getByUserId(Long userId, Integer page, Integer size) {
         Page<Favorite> pageParam = new Page<>(page, size);
-        return favoriteMapper.selectByUserId(pageParam, userId);
+        Page<Favorite> favorites = favoriteMapper.selectByUserId(pageParam, userId);
+        favorites.getRecords().forEach(favorite -> {
+            Product product = productMapper.selectProductById(favorite.getProductId());
+            favorite.setProduct(product);
+        });
+        return favorites;
     }
 
     @Override
     public boolean add(Long userId, Long productId) {
+        Favorite existingFavorite = favoriteMapper.selectAnyByUserIdAndProductId(userId, productId);
+        if (existingFavorite != null) {
+            if (Integer.valueOf(0).equals(existingFavorite.getDeleted())) {
+                return false;
+            }
+            return favoriteMapper.reactivateById(existingFavorite.getId()) > 0;
+        }
+
         LambdaQueryWrapper<Favorite> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Favorite::getUserId, userId)
                .eq(Favorite::getProductId, productId);

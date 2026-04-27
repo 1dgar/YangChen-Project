@@ -94,10 +94,12 @@
           <el-table-column label="产品信息" min-width="280">
             <template #default="{ row }">
               <div class="product-cell">
-                <div class="product-image" :style="{ backgroundColor: getCategoryBgColor(row.category) }">
-                  <el-icon :size="28" :color="getCategoryColor(row.category)">
-                    <component :is="getCategoryIconComponent(row.category)" />
-                  </el-icon>
+                <div class="product-image">
+                  <img v-if="row.image" :src="row.image" :alt="row.name" class="product-thumb" />
+                  <div v-else class="product-placeholder">
+                    <el-icon><Picture /></el-icon>
+                    <span>暂无图片</span>
+                  </div>
                 </div>
                 <div class="product-info">
                   <h4>{{ row.name }}</h4>
@@ -165,13 +167,12 @@
       <div v-else class="grid-wrapper">
         <div class="product-grid">
           <div class="product-card" v-for="product in filteredProducts" :key="product.id">
-            <div class="card-image" :style="{ backgroundColor: getCategoryBgColor(product.category) }">
-              <div class="card-icon">
-                <el-icon :size="40" :color="getCategoryColor(product.category)">
-                  <component :is="getCategoryIconComponent(product.category)" />
-                </el-icon>
+            <div class="card-image">
+              <img v-if="product.image" :src="product.image" :alt="product.name" class="card-photo" />
+              <div v-else class="card-placeholder">
+                <el-icon><Picture /></el-icon>
+                <span>暂无图片</span>
               </div>
-              <div class="card-name">{{ product.name }}</div>
               <div class="card-overlay">
                 <el-button type="primary" circle size="small" @click="editProduct(product)">
                   <el-icon><Edit /></el-icon>
@@ -248,6 +249,29 @@
         <el-form-item label="产品描述">
           <el-input v-model="editForm.description" type="textarea" :rows="3" />
         </el-form-item>
+        <el-form-item label="产品图片">
+          <div class="edit-image-panel">
+            <el-upload
+              class="edit-image-uploader"
+              :show-file-list="false"
+              :http-request="handleEditImageUpload"
+              :before-upload="beforeImageUpload"
+              :disabled="imageUploading"
+              accept="image/*"
+            >
+              <img v-if="editForm.image" :src="editForm.image" :alt="editForm.name || '产品图片'" class="edit-preview-image" />
+              <div v-else class="edit-image-placeholder">
+                <el-icon><Plus /></el-icon>
+                <span>{{ imageUploading ? '上传中...' : '上传产品图片' }}</span>
+                <small>支持 jpg/png/webp，最大 5MB</small>
+              </div>
+            </el-upload>
+            <div class="edit-image-actions">
+              <el-button v-if="editForm.image" size="small" @click="editForm.image = ''">移除图片</el-button>
+              <span v-else class="edit-image-tip">未上传时将显示“暂无图片”</span>
+            </div>
+          </div>
+        </el-form-item>
       </el-form>
       <template #footer>
         <el-button @click="editDialogVisible = false">取消</el-button>
@@ -262,10 +286,10 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { getMyProducts, deleteProduct as deleteProductApi, updateProduct } from '../../api/product'
-import { getCategoryIcon, getCategoryColor, getCategoryBgColor } from '../../utils/imageMap'
+import { uploadImage } from '../../api/file'
 import { 
   Goods, Plus, CircleCheck, Remove, TrendCharts, Search, 
-  List, Grid, Edit, Delete, Box, Food, Apple, Orange, Bowl, IceCream, Dessert
+  List, Grid, Edit, Delete, Box, Picture
 } from '@element-plus/icons-vue'
 
 const router = useRouter()
@@ -281,6 +305,7 @@ const filterCategory = ref('')
 const viewMode = ref('table')
 const editDialogVisible = ref(false)
 const editForm = ref({})
+const imageUploading = ref(false)
 
 const statistics = computed(() => {
   const total = products.value.length
@@ -333,10 +358,6 @@ const handleSearch = () => {
   page.value = 1
 }
 
-const getCategoryIconComponent = (category) => {
-  return getCategoryIcon(category)
-}
-
 const formatDate = (dateStr) => {
   if (!dateStr) return '-'
   const date = new Date(dateStr)
@@ -352,6 +373,34 @@ const formatDate = (dateStr) => {
 const editProduct = (product) => {
   editForm.value = { ...product }
   editDialogVisible.value = true
+}
+
+const beforeImageUpload = (file) => {
+  const isImage = file.type.startsWith('image/')
+  const isLt5M = file.size / 1024 / 1024 < 5
+
+  if (!isImage) {
+    ElMessage.error('只能上传图片文件')
+    return false
+  }
+  if (!isLt5M) {
+    ElMessage.error('图片大小不能超过 5MB')
+    return false
+  }
+  return true
+}
+
+const handleEditImageUpload = async ({ file }) => {
+  imageUploading.value = true
+  try {
+    const res = await uploadImage(file)
+    editForm.value.image = res.data
+    ElMessage.success('图片上传成功')
+  } catch (error) {
+    ElMessage.error(error.message || '图片上传失败')
+  } finally {
+    imageUploading.value = false
+  }
 }
 
 const saveEdit = async () => {
@@ -533,9 +582,30 @@ const deleteProduct = async (id) => {
   border-radius: 8px;
   overflow: hidden;
   flex-shrink: 0;
+  background: #f6f8f6;
+}
+
+.product-thumb {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-placeholder {
+  width: 100%;
+  height: 100%;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 2px;
+  color: #98a29a;
+  font-size: 10px;
+}
+
+.product-placeholder .el-icon {
+  font-size: 16px;
 }
 
 .product-info h4 {
@@ -599,32 +669,29 @@ const deleteProduct = async (id) => {
   position: relative;
   height: 160px;
   overflow: hidden;
+  background: #f6f8f6;
+}
+
+.card-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.card-placeholder {
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 8px;
+  color: #98a29a;
 }
 
-.card-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  margin-bottom: 10px;
-}
-
-.card-name {
-  background: rgba(255, 255, 255, 0.95);
-  padding: 4px 12px;
-  border-radius: 16px;
-  font-size: 13px;
-  font-weight: 600;
-  color: #333;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.card-placeholder .el-icon {
+  font-size: 28px;
 }
 
 .card-overlay {
@@ -721,6 +788,68 @@ const deleteProduct = async (id) => {
 
 .card-footer .el-button {
   flex: 1;
+}
+
+.edit-image-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.edit-image-uploader {
+  width: 100%;
+}
+
+.edit-image-uploader :deep(.el-upload) {
+  width: 100%;
+  border: 1px dashed #c8d6c9;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+.edit-image-uploader :deep(.el-upload:hover) {
+  border-color: #4CAF50;
+}
+
+.edit-preview-image {
+  display: block;
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  background: #f6f8f6;
+}
+
+.edit-image-placeholder {
+  height: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #6b7280;
+  background: linear-gradient(180deg, #fafcf9 0%, #f1f6f0 100%);
+}
+
+.edit-image-placeholder .el-icon {
+  font-size: 28px;
+  color: #4CAF50;
+}
+
+.edit-image-placeholder small {
+  color: #9aa29c;
+}
+
+.edit-image-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.edit-image-tip {
+  font-size: 13px;
+  color: #999;
 }
 
 .empty-state {

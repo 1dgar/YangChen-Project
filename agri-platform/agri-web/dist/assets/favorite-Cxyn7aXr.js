@@ -1,1 +1,0 @@
-import{r as t}from"./request-TUdE4Crp.js";const r=(e,o)=>t.get(`/favorite/my/${e}`,{params:o}),s=e=>t.post("/favorite",e),c=e=>t.delete(`/favorite/${e}`),i=e=>t.get(`/favorite/check/${e}`);export{s as a,i as c,r as g,c as r};

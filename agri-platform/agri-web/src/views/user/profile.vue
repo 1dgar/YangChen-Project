@@ -54,16 +54,6 @@
                 <template #prefix><el-icon><Phone /></el-icon></template>
               </el-input>
             </el-form-item>
-            <el-form-item label="邮箱">
-              <el-input v-model="form.email" placeholder="请输入邮箱">
-                <template #prefix><el-icon><Message /></el-icon></template>
-              </el-input>
-            </el-form-item>
-            <el-form-item label="地址">
-              <el-input v-model="form.address" placeholder="请输入地址">
-                <template #prefix><el-icon><Location /></el-icon></template>
-              </el-input>
-            </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="handleUpdate" :loading="loading">
                 <el-icon><Check /></el-icon>
@@ -173,11 +163,15 @@
 import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { 
-  User, Camera, Timer, Phone, Message, Location, Check, 
+  User, Camera, Timer, Phone, Check, 
   Setting, Lock, ArrowRight, TrendCharts, Menu, Goods, 
   List, Star, ChatDotRound 
 } from '@element-plus/icons-vue'
 import { getUserInfo, updateUser, updatePassword } from '../../api/user'
+import { getMyProducts } from '../../api/product'
+import { getMySupplyDemand } from '../../api/supplyDemand'
+import { getMyFavorites } from '../../api/favorite'
+import { getMyComments } from '../../api/comment'
 import { uploadImage } from '../../api/file'
 
 const userId = localStorage.getItem('userId')
@@ -223,12 +217,27 @@ onMounted(async () => {
   try {
     const res = await getUserInfo(userId)
     form.value = res.data
-    
+
+    const requests = [
+      getMySupplyDemand(userId, { page: 1, size: 1 }),
+      getMyFavorites(userId, { page: 1, size: 1 }),
+      getMyComments(userId, { page: 1, size: 1 })
+    ]
+
+    if (res.data.role === 'farmer') {
+      requests.unshift(getMyProducts(userId, { page: 1, size: 1 }))
+    }
+
+    const results = await Promise.all(requests)
+    const [productRes, supplyDemandRes, favoriteRes, commentRes] = res.data.role === 'farmer'
+      ? results
+      : [null, ...results]
+
     myStats.value = {
-      products: Math.floor(Math.random() * 20) + 5,
-      supplyDemand: Math.floor(Math.random() * 15) + 3,
-      favorites: Math.floor(Math.random() * 30) + 10,
-      comments: Math.floor(Math.random() * 25) + 5
+      products: productRes?.data?.total || 0,
+      supplyDemand: supplyDemandRes?.data?.total || 0,
+      favorites: favoriteRes?.data?.total || 0,
+      comments: commentRes?.data?.total || 0
     }
   } catch (e) {
     console.error('加载用户信息失败', e)

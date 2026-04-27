@@ -8,10 +8,11 @@ export default defineConfig({
     proxy: {
       '/api': {
         target: 'http://localhost:9999',
-        changeOrigin: true,
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8'
-        }
+        changeOrigin: true
+      },
+      '/uploads': {
+        target: 'http://localhost:9999',
+        changeOrigin: true
       }
     }
   },

@@ -71,21 +71,6 @@
         <el-table-column label="资讯信息" min-width="300">
           <template #default="{ row }">
             <div class="news-info">
-              <el-image
-                v-if="row.coverImage"
-                :src="row.coverImage"
-                fit="cover"
-                class="news-image"
-              >
-                <template #error>
-                  <div class="image-placeholder">
-                    <el-icon><Picture /></el-icon>
-                  </div>
-                </template>
-              </el-image>
-              <div class="news-image image-placeholder" v-else>
-                <el-icon><Picture /></el-icon>
-              </div>
               <div class="news-detail">
                 <div class="news-title">{{ row.title }}</div>
                 <div class="news-meta">
@@ -185,7 +170,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Document, View, Calendar, TrendCharts, Search, Plus, Picture, User, Delete, Check } from '@element-plus/icons-vue'
+import { Document, View, Calendar, TrendCharts, Search, Plus, User, Delete, Check } from '@element-plus/icons-vue'
 import { getNewsList } from '../../api/market'
 import { addNews, deleteNews } from '../../api/admin'
 
@@ -379,23 +364,7 @@ const formatDate = (date) => {
 .news-info {
   display: flex;
   align-items: center;
-  gap: 12px;
-}
-
-.news-image {
-  width: 80px;
-  height: 60px;
-  border-radius: 8px;
-  flex-shrink: 0;
-}
-
-.image-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f5f7fa;
-  color: #c0c4cc;
-  font-size: 24px;
+  min-height: 60px;
 }
 
 .news-detail {

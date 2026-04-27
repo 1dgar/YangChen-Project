@@ -78,19 +78,6 @@
         <el-table-column label="产品信息" min-width="280">
           <template #default="{ row }">
             <div class="product-info">
-              <div class="product-image-wrapper">
-                <img
-                  v-if="row.image && !row.imageError"
-                  :src="row.image"
-                  class="product-image"
-                  @error="handleImageError($event, row)"
-                  loading="lazy"
-                  referrerpolicy="no-referrer"
-                />
-                <div v-else class="image-placeholder">
-                  <el-icon><Picture /></el-icon>
-                </div>
-              </div>
               <div class="product-detail">
                 <div class="product-name">{{ row.name }}</div>
                 <div class="product-meta">
@@ -183,7 +170,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Goods, CircleCheck, CircleClose, Grid, Search, Picture, User, View } from '@element-plus/icons-vue'
+import { Goods, CircleCheck, CircleClose, Grid, Search, User, View } from '@element-plus/icons-vue'
 import { getAllProducts, updateProductStatus } from '../../api/admin'
 
 const products = ref([])
@@ -265,11 +252,6 @@ const toggleStatus = async (row) => {
 const formatDate = (date) => {
   if (!date) return '-'
   return new Date(date).toLocaleString('zh-CN')
-}
-
-const handleImageError = (e, row) => {
-  e.target.style.display = 'none'
-  row.imageError = true
 }
 </script>
 
@@ -367,25 +349,7 @@ const handleImageError = (e, row) => {
 .product-info {
   display: flex;
   align-items: center;
-  gap: 12px;
-}
-
-.product-image {
-  width: 60px;
-  height: 60px;
-  border-radius: 8px;
-  flex-shrink: 0;
-}
-
-.image-placeholder {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f5f7fa;
-  color: #c0c4cc;
-  font-size: 24px;
+  min-height: 60px;
 }
 
 .product-detail {

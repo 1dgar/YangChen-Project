@@ -127,7 +127,7 @@
               <el-icon><Timer /></el-icon>
               {{ formatDate(item.createTime) }}
             </span>
-            <el-button type="danger" link size="small" @click="removeFavorite(item.id)">
+            <el-button type="danger" link size="small" @click="removeFavorite(item.productId)">
               <el-icon><Delete /></el-icon>
               取消收藏
             </el-button>
@@ -301,8 +301,11 @@ const batchDelete = async () => {
   try {
     await ElMessageBox.confirm(`确定取消收藏选中的 ${selectedItems.value.length} 个产品吗？`, '提示', { type: 'warning' })
     
-    for (const id of selectedItems.value) {
-      await removeFavoriteApi(id)
+    for (const favoriteId of selectedItems.value) {
+      const favorite = favorites.value.find(item => item.id === favoriteId)
+      if (favorite?.productId) {
+        await removeFavoriteApi(favorite.productId)
+      }
     }
     
     ElMessage.success('批量取消收藏成功')

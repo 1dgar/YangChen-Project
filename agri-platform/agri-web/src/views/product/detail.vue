@@ -16,13 +16,12 @@
       <div class="detail-card">
         <div class="product-main">
           <div class="product-gallery">
-            <div class="main-image" :style="{ backgroundColor: getCategoryBgColor(product.category) }">
-              <div class="product-icon-large">
-                <el-icon :size="80" :color="getCategoryColor(product.category)">
-                  <component :is="getCategoryIconComponent(product.category)" />
-                </el-icon>
+            <div class="main-image">
+              <img v-if="product.image" :src="product.image" :alt="product.name" class="detail-image" />
+              <div v-else class="detail-placeholder">
+                <el-icon><Picture /></el-icon>
+                <span>暂无图片</span>
               </div>
-              <div class="product-name-display">{{ product.name }}</div>
               <div class="image-overlay">
                 <span class="category-tag">{{ product.category }}</span>
               </div>
@@ -171,22 +170,16 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { ArrowRight, Box, Grid, User, Phone, Location, Star, ChatDotRound, Position, ChatLineSquare, Loading, Food, Apple, Orange, Bowl, IceCream, Dessert } from '@element-plus/icons-vue'
+import { ArrowRight, Box, Grid, User, Phone, Location, Star, ChatDotRound, Position, ChatLineSquare, Loading, Picture } from '@element-plus/icons-vue'
 import { getProductDetail } from '../../api/product'
 import { getProductComments, addComment, replyComment } from '../../api/comment'
 import { addFavorite, removeFavorite, checkFavorite } from '../../api/favorite'
-import { getCategoryIcon, getCategoryColor, getCategoryBgColor } from '../../utils/imageMap'
-
 const route = useRoute()
 const product = ref(null)
 const comments = ref([])
 const isFavorited = ref(false)
 const commentForm = ref({ content: '' })
 const userId = ref(localStorage.getItem('userId'))
-
-const getCategoryIconComponent = (category) => {
-  return getCategoryIcon(category)
-}
 
 const isOwnProduct = computed(() => {
   return product.value && product.value.userId == userId.value
@@ -340,33 +333,31 @@ const handleReply = async (comment) => {
   border-radius: 12px;
   overflow: hidden;
   height: 450px;
+  background: #f6f8f6;
+}
+
+.detail-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.detail-placeholder {
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s;
-}
-
-.product-icon-large {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
-}
-
-.product-name-display {
-  background: rgba(255, 255, 255, 0.95);
-  padding: 10px 24px;
-  border-radius: 24px;
+  gap: 12px;
+  color: #98a29a;
+  background: linear-gradient(180deg, #fafcf9 0%, #eef3ee 100%);
   font-size: 18px;
-  font-weight: 600;
-  color: #333;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.detail-placeholder .el-icon {
+  font-size: 64px;
 }
 
 .image-overlay {
