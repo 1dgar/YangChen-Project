@@ -18,6 +18,21 @@
     <!-- 主导航搜索区 -->
     <section class="hero-section">
       <div class="hero-bg">
+        <!-- 动态渐变层 -->
+        <div class="gradient-animated"></div>
+        <!-- 浮动元素 -->
+        <div class="floating-elements">
+          <div class="float-item item-1">🌾</div>
+          <div class="float-item item-2">🍎</div>
+          <div class="float-item item-3">🥬</div>
+          <div class="float-item item-4">🌽</div>
+          <div class="float-item item-5">🍊</div>
+          <div class="float-item item-6">🥕</div>
+          <div class="float-item item-7">🍇</div>
+          <div class="float-item item-8">🌻</div>
+        </div>
+        <!-- 网格纹理 -->
+        <div class="grid-pattern"></div>
         <div class="hero-overlay"></div>
         <div class="container">
           <div class="hero-content">
@@ -245,32 +260,25 @@
                 </router-link>
               </div>
               <div class="products-grid">
-                <div class="product-card-simple" v-for="product in filteredProducts.slice(0, 8)" :key="product.id" @click="goToProduct(product.id)">
-                  <div class="card-header">
-                    <span class="category-badge" :style="{ backgroundColor: getCategoryBgColor(product.category), color: getCategoryColor(product.category) }">
-                      {{ product.category }}
-                    </span>
-                    <span class="stock-tag" v-if="product.stock < 50">库存紧张</span>
+                <div class="product-card" v-for="product in filteredProducts.slice(0, 8)" :key="product.id" @click="goToProduct(product.id)">
+                  <div class="product-main">
+                    <span class="product-tag" v-if="product.stock < 50">库存紧张</span>
+                    <h4 class="product-name">{{ product.name }}</h4>
+                    <p class="product-category">{{ product.category }}</p>
+                    <div class="product-price">
+                      <span class="price-num">¥{{ product.price }}</span>
+                      <span class="price-unit">/{{ product.unit }}</span>
+                    </div>
                   </div>
-                  <h4 class="product-title">{{ product.name }}</h4>
-                  <div class="price-row">
-                    <span class="price">
-                      <em>¥</em>{{ product.price }}
-                      <small>/{{ product.unit }}</small>
-                    </span>
-                  </div>
-                  <div class="info-row">
-                    <span class="info-item">
+                  <div class="product-meta">
+                    <span class="meta-item">
                       <el-icon><Location /></el-icon>
-                      {{ product.origin }}
+                      {{ product.origin || '产地直供' }}
                     </span>
-                  </div>
-                  <div class="card-footer">
-                    <span class="seller">
+                    <span class="meta-item seller">
                       <el-icon><User /></el-icon>
-                      {{ product.seller }}
+                      {{ product.seller || '农户直供' }}
                     </span>
-                    <span class="view-detail">查看详情 →</span>
                   </div>
                 </div>
               </div>
@@ -748,11 +756,50 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* 页面整体背景 */
+.home {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #e8f5e9 0%, #dcedc8 25%, #f1f8e9 50%, #f5f5f5 75%, #fafafa 100%);
+  position: relative;
+}
+
+.home::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(circle at 15% 25%, rgba(76, 175, 80, 0.08) 0%, transparent 25%),
+    radial-gradient(circle at 85% 75%, rgba(139, 195, 74, 0.08) 0%, transparent 25%),
+    radial-gradient(circle at 50% 50%, rgba(129, 199, 132, 0.05) 0%, transparent 35%),
+    radial-gradient(circle at 75% 20%, rgba(104, 159, 56, 0.06) 0%, transparent 30%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* 页面背景装饰图案 */
+.home::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%234caf50' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  opacity: 0.6;
+  pointer-events: none;
+  z-index: 0;
+}
+
 /* 基础布局 */
 .container {
   max-width: 1400px;
   margin: 0 auto;
   padding: 0 24px;
+  position: relative;
+  z-index: 1;
 }
 
 /* 顶部信息栏 */
@@ -828,6 +875,99 @@ onMounted(() => {
   width: 100%;
   height: 100%;
   background: linear-gradient(135deg, #1a5f2a 0%, #2e7d32 35%, #388e3c 65%, #43a047 100%);
+  overflow: hidden;
+}
+
+/* 动态渐变动画层 */
+.gradient-animated {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: 
+    radial-gradient(ellipse at 30% 20%, rgba(129, 199, 132, 0.4) 0%, transparent 40%),
+    radial-gradient(ellipse at 70% 80%, rgba(165, 214, 167, 0.35) 0%, transparent 45%),
+    radial-gradient(ellipse at 50% 50%, rgba(200, 230, 201, 0.25) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 30%, rgba(76, 175, 80, 0.3) 0%, transparent 35%),
+    radial-gradient(ellipse at 20% 70%, rgba(139, 195, 74, 0.35) 0%, transparent 40%);
+  animation: gradientMove 20s ease-in-out infinite;
+}
+
+@keyframes gradientMove {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+  25% {
+    transform: translate(2%, 2%) rotate(2deg) scale(1.05);
+  }
+  50% {
+    transform: translate(-1%, 3%) rotate(-1deg) scale(1.02);
+  }
+  75% {
+    transform: translate(3%, -2%) rotate(1deg) scale(1.03);
+  }
+}
+
+/* 网格纹理 */
+.grid-pattern {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  opacity: 0.5;
+}
+
+/* 浮动农产品元素 */
+.floating-elements {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.float-item {
+  position: absolute;
+  font-size: 2.5rem;
+  opacity: 0.15;
+  filter: blur(0.5px);
+  animation: float 15s ease-in-out infinite;
+}
+
+.item-1 { left: 5%; top: 15%; animation-delay: 0s; animation-duration: 18s; }
+.item-2 { left: 15%; top: 60%; animation-delay: 2s; animation-duration: 20s; }
+.item-3 { left: 25%; top: 25%; animation-delay: 4s; animation-duration: 16s; }
+.item-4 { left: 70%; top: 10%; animation-delay: 1s; animation-duration: 22s; }
+.item-5 { left: 80%; top: 50%; animation-delay: 3s; animation-duration: 19s; }
+.item-6 { left: 60%; top: 70%; animation-delay: 5s; animation-duration: 17s; }
+.item-7 { left: 40%; top: 80%; animation-delay: 2.5s; animation-duration: 21s; }
+.item-8 { left: 90%; top: 30%; animation-delay: 4.5s; animation-duration: 18s; }
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg) scale(1);
+    opacity: 0.15;
+  }
+  25% {
+    transform: translateY(-20px) rotate(5deg) scale(1.1);
+    opacity: 0.2;
+  }
+  50% {
+    transform: translateY(-10px) rotate(-3deg) scale(0.95);
+    opacity: 0.12;
+  }
+  75% {
+    transform: translateY(-25px) rotate(8deg) scale(1.05);
+    opacity: 0.18;
+  }
 }
 
 .hero-bg::before {
@@ -1003,7 +1143,9 @@ onMounted(() => {
 /* 快捷入口区 */
 .quick-section {
   padding: 32px 0;
-  background: linear-gradient(180deg, #f0f7f0 0%, #e8f5e9 50%, #f5faf5 100%);
+  background: transparent;
+  position: relative;
+  z-index: 1;
 }
 
 .quick-grid {
@@ -1325,7 +1467,9 @@ onMounted(() => {
 /* 产品分类区 */
 .category-section {
   padding: 48px 0;
-  background: linear-gradient(180deg, #ffffff 0%, #fafcf9 100%);
+  background: transparent;
+  position: relative;
+  z-index: 1;
 }
 
 .section-layout {
@@ -1458,127 +1602,104 @@ onMounted(() => {
   gap: 16px;
 }
 
-.product-card-simple {
-  background: linear-gradient(180deg, #ffffff 0%, #fafcf9 100%);
-  border-radius: 12px;
+/* 简洁产品卡片 */
+.product-card {
+  background: #fff;
+  border-radius: 8px;
   padding: 16px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
   cursor: pointer;
-  transition: all 0.3s ease;
-  border: 1px solid #e8f5e9;
+  transition: all 0.2s ease;
+  border: 1px solid #e8e8e8;
   display: flex;
   flex-direction: column;
-}
-
-.product-card-simple:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 16px 32px rgba(76, 175, 80, 0.15);
-  border-color: #4CAF50;
-  background: #fff;
-}
-
-.product-card-simple .card-header {
-  display: flex;
-  align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
+  min-height: 140px;
 }
 
-.product-card-simple .category-badge {
-  padding: 4px 10px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 500;
+.product-card:hover {
+  border-color: #4CAF50;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
-.product-card-simple .stock-tag {
-  background: #fff3e0;
-  color: #ff9800;
+.product-main {
+  flex: 1;
+}
+
+.product-tag {
+  display: inline-block;
+  background: #fff7e6;
+  color: #fa8c16;
   padding: 2px 8px;
   border-radius: 4px;
-  font-size: 11px;
-}
-
-.product-card-simple .product-title {
-  font-size: 16px;
-  font-weight: 600;
-  margin: 0 0 12px 0;
-  color: #333;
-  line-height: 1.4;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.product-card-simple .price-row {
-  margin-bottom: 10px;
-}
-
-.product-card-simple .price {
-  color: #f44336;
-  font-size: 22px;
-  font-weight: 700;
-}
-
-.product-card-simple .price em {
-  font-size: 14px;
-  font-style: normal;
-}
-
-.product-card-simple .price small {
   font-size: 12px;
-  color: #999;
-  font-weight: 400;
+  margin-bottom: 8px;
 }
 
-.product-card-simple .info-row {
-  margin-bottom: 12px;
-}
-
-.product-card-simple .info-item {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 13px;
-  color: #666;
-}
-
-.product-card-simple .info-item .el-icon {
-  color: #999;
-}
-
-.product-card-simple .card-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: 12px;
-  border-top: 1px solid #f5f5f5;
-  margin-top: auto;
-}
-
-.product-card-simple .seller {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  color: #666;
-}
-
-.product-card-simple .seller .el-icon {
-  color: #4CAF50;
-}
-
-.product-card-simple .view-detail {
-  font-size: 12px;
-  color: #4CAF50;
+.product-name {
+  font-size: 15px;
   font-weight: 500;
+  color: #333;
+  margin: 0 0 4px 0;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.product-category {
+  font-size: 13px;
+  color: #999;
+  margin: 0 0 12px 0;
+}
+
+.product-price {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+
+.price-num {
+  color: #f5222d;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.price-unit {
+  color: #999;
+  font-size: 13px;
+}
+
+.product-meta {
+  display: flex;
+  gap: 16px;
+  padding-top: 12px;
+  margin-top: 12px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #666;
+}
+
+.meta-item .el-icon {
+  font-size: 13px;
+  color: #bfbfbf;
+}
+
+.meta-item.seller {
+  margin-left: auto;
 }
 
 /* 行情区 */
 .market-section {
   padding: 48px 0;
-  background: linear-gradient(180deg, #f5faf5 0%, #e8f5e9 50%, #f0f7f0 100%);
+  background: transparent;
+  position: relative;
+  z-index: 1;
 }
 
 .market-section .section-header {
@@ -1797,7 +1918,9 @@ onMounted(() => {
 /* 供需区 */
 .supply-demand-section {
   padding: 48px 0;
-  background: linear-gradient(180deg, #f5faf5 0%, #e8f5e9 50%, #f0f7f0 100%);
+  background: transparent;
+  position: relative;
+  z-index: 1;
 }
 
 .sd-layout {
@@ -1930,7 +2053,9 @@ onMounted(() => {
 /* 资讯区 */
 .news-section {
   padding: 48px 0;
-  background: linear-gradient(180deg, #ffffff 0%, #fafcf9 100%);
+  background: transparent;
+  position: relative;
+  z-index: 1;
 }
 
 .news-layout {

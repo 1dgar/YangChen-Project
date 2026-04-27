@@ -143,9 +143,28 @@ const handleSubmit = async () => {
   
   loading.value = true
   try {
-    await publishSupplyDemand(form)
-    ElMessage.success('发布成功')
-    router.push('/supply-demand')
+    // 创建提交数据的副本，确保包含所有字段
+    const submitData = {
+      type: form.type,
+      title: form.title,
+      category: form.category,
+      quantity: form.quantity,
+      price: form.price,
+      content: form.content,
+      contactName: form.contactName,
+      contactPhone: form.contactPhone,
+      contactAddress: form.contactAddress,
+      status: 1
+    }
+    console.log('提交的数据:', submitData)
+    const res = await publishSupplyDemand(submitData)
+    console.log('发布响应:', res)
+    if (res.code === 200 || res.code === 0) {
+      ElMessage.success('发布成功')
+      router.push('/supply-demand')
+    } else {
+      ElMessage.error(res.message || '发布失败')
+    }
   } catch (error) {
     console.error('发布失败:', error)
     if (error.response?.status === 401) {

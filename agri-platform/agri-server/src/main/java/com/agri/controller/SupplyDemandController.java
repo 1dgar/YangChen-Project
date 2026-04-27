@@ -63,9 +63,12 @@ public class SupplyDemandController {
     public Result<?> publish(@RequestBody SupplyDemand supplyDemand) {
         Long userId = UserContext.getCurrentUserId();
         supplyDemand.setUserId(userId);
+        System.out.println("收到发布请求: " + supplyDemand);
         if (supplyDemandService.publish(supplyDemand)) {
+            System.out.println("发布成功，id: " + supplyDemand.getId());
             return Result.success("发布成功");
         }
+        System.out.println("发布失败");
         return Result.error("发布失败");
     }
 
